@@ -32,12 +32,11 @@ of each item they'll bring.
    _Tip:_ enable Neon's "create a branch for each preview deployment" option so preview deploys never
    migrate the production database.
 3. **Storage → Create → Blob** and connect it. This sets `BLOB_READ_WRITE_TOKEN`.
-4. **Resend:** the sending domain is `mail.ranchosignup.com` (DKIM TXT `resend._domainkey.mail`, SPF CNAMEs
-   `send.mail` and `rsend.mail`, plus `_dmarc` on the apex, all in Cloudflare). Create an API key once it
-   shows "Verified".
+4. **Resend:** the sending domain is `ranchosignup.com` (DKIM TXT `resend._domainkey`, SPF CNAMEs `send` and
+   `rsend`, plus a `_dmarc` TXT, all in Cloudflare as DNS only). Create an API key once it shows "Verified".
 5. **Environment variables** (Project → Settings → Environment Variables):
    - `RESEND_API_KEY`: from Resend
-   - `EMAIL_FROM`: `Rancho Solano PTO <signups@mail.ranchosignup.com>`
+   - `EMAIL_FROM`: `Rancho Solano PTO <signups@ranchosignup.com>`
    - `ADMIN_EMAILS`: your email (comma-separate several)
    - `APP_URL`: `https://ranchosignup.com`
    - `RATE_LIMIT_SALT`: any long random string
