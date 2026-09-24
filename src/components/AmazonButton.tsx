@@ -1,4 +1,4 @@
-export function AmazonButton({ href, label = "Shop the Amazon list" }: { href: string; label?: string }) {
+export function AmazonButton({ href, label = "Buy on Amazon" }: { href: string; label?: string }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
       <svg

@@ -4,6 +4,7 @@ import { del } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin, requireOrganizer, signOut } from "@/lib/auth";
+import { isOurBlobUrl } from "@/lib/blob-url";
 import { db } from "@/lib/db";
 import { env } from "@/lib/env";
 import * as events from "@/lib/events";
@@ -29,6 +30,7 @@ function readEvent(fd: FormData) {
     description: fd.get("description") ?? "",
     themeKey: fd.get("themeKey") ?? "",
     amazonListUrl: fd.get("amazonListUrl") ?? "",
+    headerText: fd.get("headerText") ?? "",
     status: fd.get("status") ?? undefined,
   });
 }
@@ -37,7 +39,6 @@ function readItem(fd: FormData) {
   return itemSchema.safeParse({
     name: fd.get("name") ?? "",
     notes: fd.get("notes") ?? "",
-    productUrl: fd.get("productUrl") ?? "",
     quantityNeeded: fd.get("quantityNeeded") ?? "",
   });
 }
@@ -129,22 +130,28 @@ export async function moveItemAction(eventId: string, itemId: string, direction:
   refresh(eventId);
 }
 
-/** Accept only images we uploaded to this project's Vercel Blob store. */
-function isOurBlobUrl(url: string): boolean {
-  try {
-    const u = new URL(url);
-    return u.protocol === "https:" && u.hostname.endsWith(".public.blob.vercel-storage.com");
-  } catch {
-    return false;
-  }
-}
-
 export async function addImageAction(eventId: string, url: string, alt: string): Promise<FormState> {
   await requireOrganizer();
   if (!isOurBlobUrl(url)) return { error: "Upload failed. Please try again." };
   await events.addImage(eventId, url, alt.trim().slice(0, 200));
   refresh(eventId);
   return { ok: true };
+}
+
+export async function setHeaderImageAction(eventId: string, url: string): Promise<FormState> {
+  await requireOrganizer();
+  if (!isOurBlobUrl(url)) return { error: "Upload failed. Please try again." };
+  const previous = await events.setHeaderImage(eventId, url);
+  if (previous && previous !== url) await deleteBlobs([previous]);
+  refresh(eventId);
+  return { ok: true };
+}
+
+export async function removeHeaderImageAction(eventId: string) {
+  await requireOrganizer();
+  const previous = await events.setHeaderImage(eventId, null);
+  if (previous) await deleteBlobs([previous]);
+  refresh(eventId);
 }
 
 export async function removeImageAction(eventId: string, imageId: string) {

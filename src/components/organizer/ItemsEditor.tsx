@@ -57,21 +57,6 @@ function ItemFields({ item, fe }: { item?: ItemAvailability; fe: FormState["fiel
           placeholder="e.g. Nut-free please"
         />
       </div>
-      <div className="sm:col-span-2">
-        <label htmlFor={`url-${uid}`} className="field-label">
-          Amazon product link <span className="font-normal text-navy-500">(optional)</span>
-        </label>
-        <input
-          id={`url-${uid}`}
-          name="productUrl"
-          type="url"
-          inputMode="url"
-          className="field"
-          defaultValue={item?.productUrl ?? ""}
-          placeholder="https://www.amazon.com/dp/…"
-        />
-        {e.productUrl && <p className="field-error">{e.productUrl[0]}</p>}
-      </div>
     </div>
   );
 }
@@ -126,7 +111,6 @@ function ItemRow({
         {item.notes && <p className="text-sm text-navy-700">{item.notes}</p>}
         <p className="mt-0.5 text-sm text-navy-700">
           <strong>{item.claimed}</strong> of {item.quantityNeeded} claimed
-          {item.productUrl && " · has product link"}
         </p>
         {delState.error && <p className="field-error">{delState.error}</p>}
       </div>

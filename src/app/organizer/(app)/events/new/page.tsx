@@ -25,6 +25,7 @@ export default function NewEventPage() {
             description: "",
             themeKey: "classic",
             amazonListUrl: "",
+            headerText: "",
             status: "DRAFT",
           }}
         />

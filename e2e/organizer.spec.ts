@@ -28,11 +28,12 @@ test.describe("signed in", () => {
     await page.getByLabel("Event name").fill(title);
     await page.getByLabel("Date").fill("2099-02-13");
     await page.getByRole("button", { name: /Valentine's Day/ }).click();
-    await page.getByLabel("Amazon list link").fill("https://example.com/not-amazon");
+    await page.getByLabel("Amazon gift list link").fill("https://example.com/not-amazon");
+    await page.getByLabel("Header text").fill("Bring a card for every classmate!");
     await page.getByRole("button", { name: "Create event" }).click();
     await expect(page.getByText("Must be an amazon.com link")).toBeVisible();
 
-    await page.getByLabel("Amazon list link").fill("https://www.amazon.com/hz/wishlist/ls/E2E");
+    await page.getByLabel("Amazon gift list link").fill("https://www.amazon.com/hz/wishlist/ls/E2E");
     await page.getByRole("button", { name: "Create event" }).click();
     await expect(page.getByText("Event created.")).toBeVisible();
 
@@ -48,6 +49,11 @@ test.describe("signed in", () => {
     const link = await page.getByLabel("Public sign-up link").inputValue();
     await page.goto(link);
     await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible();
+    await expect(page.getByText("Bring a card for every classmate!")).toBeVisible();
+    await expect(page.getByRole("link", { name: /Buy on Amazon/ })).toHaveAttribute(
+      "href",
+      "https://www.amazon.com/hz/wishlist/ls/E2E",
+    );
     await expect(page.getByText("3 of 3 still needed")).toBeVisible();
   });
 

@@ -52,10 +52,18 @@ describe("eventSchema", () => {
   };
 
   it("accepts a minimal event", () => {
-    const r = eventSchema.parse(base);
+    const r = eventSchema.parse({ ...base, headerText: "" });
+    expect(r.headerText).toBeNull();
     expect(r.location).toBeNull();
     expect(r.amazonListUrl).toBeNull();
     expect(r.status).toBeUndefined();
+  });
+
+  it("keeps custom header text, trimmed and capped", () => {
+    expect(eventSchema.parse({ ...base, headerText: "  Costumes welcome!  " }).headerText).toBe(
+      "Costumes welcome!",
+    );
+    expect(eventSchema.safeParse({ ...base, headerText: "x".repeat(161) }).success).toBe(false);
   });
 
   it("rejects non-Amazon list links and unknown themes", () => {
@@ -67,11 +75,7 @@ describe("eventSchema", () => {
 
 describe("itemSchema", () => {
   it("coerces quantity and bounds it", () => {
-    expect(
-      itemSchema.parse({ name: "Plates", notes: "", productUrl: "", quantityNeeded: "4" }).quantityNeeded,
-    ).toBe(4);
-    expect(
-      itemSchema.safeParse({ name: "Plates", notes: "", productUrl: "", quantityNeeded: "0" }).success,
-    ).toBe(false);
+    expect(itemSchema.parse({ name: "Plates", notes: "", quantityNeeded: "4" }).quantityNeeded).toBe(4);
+    expect(itemSchema.safeParse({ name: "Plates", notes: "", quantityNeeded: "0" }).success).toBe(false);
   });
 });

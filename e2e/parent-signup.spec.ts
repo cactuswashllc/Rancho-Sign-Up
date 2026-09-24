@@ -7,10 +7,10 @@ test("parent signs up, edits, and cancels", async ({ page }, info) => {
   await page.getByRole("link", { name: /3rd Grade Halloween Party/ }).click();
 
   await expect(page.getByRole("heading", { level: 1, name: "3rd Grade Halloween Party" })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Shop the Amazon list/ })).toHaveAttribute(
-    "href",
-    /amazon\.com/,
-  );
+  // Exactly one Amazon button, pointing at the event's gift list.
+  const buy = page.getByRole("link", { name: /Buy on Amazon/ });
+  await expect(buy).toHaveCount(1);
+  await expect(buy).toHaveAttribute("href", "https://www.amazon.com/hz/wishlist/ls/DEMO123");
 
   // Sign-up button is disabled until something is selected.
   const submit = page.getByRole("button", { name: "Sign up" });
@@ -31,7 +31,7 @@ test("parent signs up, edits, and cancels", async ({ page }, info) => {
 
   await expect(page.getByRole("heading", { name: `Thank you, Pat ${n}!` })).toBeVisible();
   await expect(page.getByText("1 ×")).toBeVisible();
-  await expect(page.getByRole("link", { name: /Buy from the Amazon list/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Buy on Amazon/ })).toBeVisible();
 
   // Edit: bring 2 juice boxes too.
   await page.getByRole("button", { name: "Increase Quantity of Juice boxes (10-pack)" }).click();

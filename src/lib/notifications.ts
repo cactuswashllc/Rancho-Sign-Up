@@ -8,7 +8,7 @@ interface ConfirmationInput {
   parentName: string;
   studentName: string;
   event: { title: string; eventDate: Date; location: string | null; amazonListUrl: string | null };
-  lines: { name: string; quantity: number; productUrl: string | null }[];
+  lines: { name: string; quantity: number }[];
   token: string;
   updated?: boolean;
 }
@@ -20,12 +20,7 @@ export async function sendSignupConfirmation(input: ConfirmationInput) {
 
   const listText = input.lines.map((l) => `  • ${l.quantity} × ${l.name}`).join("\n");
   const listHtml = input.lines
-    .map(
-      (l) =>
-        `<li style="margin:4px 0"><strong>${l.quantity} ×</strong> ${escapeHtml(l.name)}${
-          l.productUrl ? ` — <a href="${escapeHtml(l.productUrl)}" style="color:#13315c">view item</a>` : ""
-        }</li>`,
-    )
+    .map((l) => `<li style="margin:4px 0"><strong>${l.quantity} ×</strong> ${escapeHtml(l.name)}</li>`)
     .join("");
   const amazon = input.event.amazonListUrl;
 
@@ -40,7 +35,7 @@ export async function sendSignupConfirmation(input: ConfirmationInput) {
       `You're bringing:`,
       listText,
       ``,
-      amazon ? `Buy from the class Amazon list: ${amazon}\n` : ``,
+      amazon ? `Buy on Amazon: ${amazon}\n` : ``,
       `Need to change or cancel? Use your private link: ${manageUrl}`,
     ].join("\n"),
     html: emailLayout(
@@ -49,7 +44,7 @@ export async function sendSignupConfirmation(input: ConfirmationInput) {
         input.event.location ? ` (${escapeHtml(input.event.location)})` : ""
       } on behalf of <strong>${escapeHtml(input.studentName)}</strong> is ${verb}.</p>
 <p style="margin-bottom:4px">You're bringing:</p><ul style="padding-left:20px;margin-top:4px">${listHtml}</ul>
-${amazon ? buttonHtml(amazon, "Open the Amazon list") : ""}
+${amazon ? buttonHtml(amazon, "Buy on Amazon") : ""}
 <p style="font-size:14px">Need to change or cancel? <a href="${escapeHtml(manageUrl)}" style="color:#13315c">Manage your sign-up</a>. Keep this email — the link is private to you.</p>`,
     ),
   });
@@ -71,7 +66,6 @@ export async function sendConfirmation(signupId: string, token: string, updated 
       lines: signup.items.map((l) => ({
         name: l.item.name,
         quantity: l.quantity,
-        productUrl: l.item.productUrl,
       })),
       token,
       updated,

@@ -50,7 +50,7 @@ export default async function EventPage({ params }: Props) {
           Draft preview — only organizers can see this page until it&apos;s opened.
         </p>
       )}
-      <ThemeBanner theme={theme}>
+      <ThemeBanner theme={theme} imageUrl={event.headerImageUrl}>
         <p
           className="flex items-center gap-2 text-sm font-semibold tracking-[0.2em] uppercase"
           style={{ color: theme.accent }}
@@ -63,7 +63,9 @@ export default async function EventPage({ params }: Props) {
           {formatEventDate(event.eventDate)}
           {event.location && <span className="text-navy-300"> · {event.location}</span>}
         </p>
-        <p className="mt-2 font-serif text-lg italic text-navy-300">{theme.tagline}</p>
+        <p className="mt-2 max-w-2xl font-serif text-lg italic text-navy-100">
+          {event.headerText ?? theme.tagline}
+        </p>
       </ThemeBanner>
 
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
@@ -86,7 +88,8 @@ export default async function EventPage({ params }: Props) {
               <div className="mt-4">
                 <AmazonButton href={event.amazonListUrl} />
                 <p className="mt-2 text-xs text-navy-700">
-                  Sign up here first so we know who&apos;s bringing what, then purchase from the list.
+                  Sign up below first so we know who&apos;s bringing what, then buy your items from our Amazon
+                  gift list.
                 </p>
               </div>
             )}

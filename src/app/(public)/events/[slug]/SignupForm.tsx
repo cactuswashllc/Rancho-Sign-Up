@@ -43,16 +43,6 @@ export function SignupForm({ items, action }: { items: ItemAvailability[]; actio
                   <div className="min-w-0">
                     <h3 className="text-base font-semibold text-navy-900">{item.name}</h3>
                     {item.notes && <p className="mt-0.5 text-sm text-navy-700">{item.notes}</p>}
-                    {item.productUrl && (
-                      <a
-                        href={item.productUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-1 inline-block text-sm font-medium text-navy-800 underline underline-offset-4"
-                      >
-                        View on Amazon ↗
-                      </a>
-                    )}
                   </div>
                   {full && (
                     <span className="shrink-0 rounded-full bg-navy-900 px-2.5 py-1 text-xs font-semibold text-white">

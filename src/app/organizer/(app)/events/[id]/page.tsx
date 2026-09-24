@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ConfirmButton } from "@/components/organizer/ConfirmButton";
 import { EventForm } from "@/components/organizer/EventForm";
+import { HeaderImageManager } from "@/components/organizer/HeaderImageManager";
 import { ImageManager } from "@/components/organizer/ImageManager";
 import { ItemsEditor } from "@/components/organizer/ItemsEditor";
 import { ShareLink } from "@/components/organizer/ShareLink";
@@ -11,15 +12,18 @@ import { toDateInputValue } from "@/lib/dates";
 import { appUrl, env } from "@/lib/env";
 import { getEventForOrganizer } from "@/lib/events";
 import { getAvailability } from "@/lib/signups";
+import { getTheme } from "@/lib/themes";
 import {
   addImageAction,
   addItemAction,
   deleteEventAction,
   deleteItemAction,
   makeCoverAction,
+  removeHeaderImageAction,
   moveItemAction,
   removeImageAction,
   removeSignupAction,
+  setHeaderImageAction,
   setStatusAction,
   updateEventAction,
   updateItemAction,
@@ -140,6 +144,26 @@ export default async function EditEventPage({ params, searchParams }: Props) {
         )}
       </section>
 
+      <section className="card mt-6 p-5 sm:p-8" aria-labelledby="header-h">
+        <h2 id="header-h" className="heading text-2xl">
+          Header image
+        </h2>
+        <p className="mt-1 text-sm text-navy-700">
+          Optional. Replaces the theme pattern behind the event name. Edit the header text under Event
+          details.
+        </p>
+        <HeaderImageManager
+          eventId={event.id}
+          theme={getTheme(event.themeKey)}
+          title={event.title}
+          headerText={event.headerText}
+          imageUrl={event.headerImageUrl}
+          uploadsEnabled={!!env().BLOB_READ_WRITE_TOKEN}
+          setAction={setHeaderImageAction.bind(null, event.id)}
+          removeAction={removeHeaderImageAction.bind(null, event.id)}
+        />
+      </section>
+
       <section className="card mt-6 p-5 sm:p-8" aria-labelledby="photos-h">
         <h2 id="photos-h" className="heading text-2xl">
           Photos
@@ -162,6 +186,7 @@ export default async function EditEventPage({ params, searchParams }: Props) {
         <EventForm
           action={updateEventAction.bind(null, event.id)}
           submitLabel="Save details"
+          headerImageUrl={event.headerImageUrl}
           initial={{
             title: event.title,
             eventDate: toDateInputValue(event.eventDate),
@@ -169,6 +194,7 @@ export default async function EditEventPage({ params, searchParams }: Props) {
             description: event.description,
             themeKey: event.themeKey,
             amazonListUrl: event.amazonListUrl ?? "",
+            headerText: event.headerText ?? "",
             status: event.status,
           }}
         />

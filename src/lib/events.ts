@@ -61,6 +61,8 @@ export async function updateEvent(id: string, input: EventInput) {
 
 export async function deleteEvent(id: string) {
   const images = await db.eventImage.findMany({ where: { eventId: id }, select: { url: true } });
+  const event = await db.event.findUnique({ where: { id }, select: { headerImageUrl: true } });
+  if (event?.headerImageUrl) images.push({ url: event.headerImageUrl });
   // Sign-ups first: SignupItem → Item is NO ACTION so a claimed item can
   // never be deleted on its own, which also blocks a one-shot cascade.
   await db.$transaction([
@@ -121,6 +123,14 @@ export async function moveItem(eventId: string, itemId: string, direction: "up" 
   await db.$transaction(
     items.map((x, idx) => db.item.update({ where: { id: x.id }, data: { sortOrder: idx } })),
   );
+}
+
+/** Set (or clear with null) the custom header image. Returns the previous URL so its blob can be deleted. */
+export async function setHeaderImage(eventId: string, url: string | null) {
+  const before = await db.event.findUnique({ where: { id: eventId }, select: { headerImageUrl: true } });
+  if (!before) return null;
+  await db.event.update({ where: { id: eventId }, data: { headerImageUrl: url } });
+  return before.headerImageUrl;
 }
 
 export async function addImage(eventId: string, url: string, alt: string) {

@@ -61,20 +61,25 @@ model Session {
 }
 
 model Event {
-  id            String      @id @default(cuid())
-  slug          String      @unique
-  title         String
+  id             String      @id @default(cuid())
+  slug           String      @unique
+  title          String
   /// Calendar date of the event (stored at midnight UTC; displayed as a date only).
-  eventDate     DateTime    @db.Date
-  location      String?
-  description   String      @default("")
-  themeKey      String      @default("classic")
-  amazonListUrl String?
-  status        EventStatus @default(DRAFT)
-  createdById   String?
-  createdBy     Organizer?  @relation(fields: [createdById], references: [id], onDelete: SetNull)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  eventDate      DateTime    @db.Date
+  location       String?
+  description    String      @default("")
+  themeKey       String      @default("classic")
+  /// The event's Amazon gift list; parents see one "Buy on Amazon" button.
+  amazonListUrl  String?
+  /// Optional line under the title in the header (falls back to the theme tagline).
+  headerText     String?
+  /// Optional custom header background (Vercel Blob URL; replaces the theme pattern).
+  headerImageUrl String?
+  status         EventStatus @default(DRAFT)
+  createdById    String?
+  createdBy      Organizer?  @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 
   images  EventImage[]
   items   Item[]
@@ -101,8 +106,6 @@ model Item {
   event          Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   name           String
   notes          String   @default("")
-  /// Optional direct product link (must be an Amazon URL).
-  productUrl     String?
   quantityNeeded Int
   sortOrder      Int      @default(0)
   createdAt      DateTime @default(now())

@@ -14,7 +14,6 @@ export interface ItemAvailability {
   id: string;
   name: string;
   notes: string;
-  productUrl: string | null;
   quantityNeeded: number;
   claimed: number;
   remaining: number;
@@ -40,7 +39,6 @@ export async function getAvailability(eventId: string): Promise<ItemAvailability
       id: i.id,
       name: i.name,
       notes: i.notes,
-      productUrl: i.productUrl,
       quantityNeeded: i.quantityNeeded,
       claimed,
       remaining: Math.max(0, i.quantityNeeded - claimed),

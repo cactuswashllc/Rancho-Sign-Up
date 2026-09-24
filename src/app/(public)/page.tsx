@@ -36,7 +36,8 @@ export default async function HomePage() {
           <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {events.map((event) => {
               const theme = getTheme(event.themeKey);
-              const cover = event.images[0];
+              const cover =
+                event.images[0] ?? (event.headerImageUrl ? { url: event.headerImageUrl, alt: "" } : null);
               return (
                 <li key={event.id}>
                   <Link

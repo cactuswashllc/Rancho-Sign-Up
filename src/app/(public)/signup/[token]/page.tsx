@@ -39,7 +39,7 @@ export default async function ManageSignupPage({ params, searchParams }: Props) 
 
   return (
     <>
-      <ThemeBanner theme={theme} compact>
+      <ThemeBanner theme={theme} imageUrl={event.headerImageUrl} compact>
         {sp.new ? (
           <>
             <p className="eyebrow text-navy-300">You&apos;re signed up</p>
@@ -84,23 +84,13 @@ export default async function ManageSignupPage({ params, searchParams }: Props) 
                 <span>
                   <strong>{l.quantity} ×</strong> {l.item.name}
                 </span>
-                {l.item.productUrl && (
-                  <a
-                    href={l.item.productUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="shrink-0 text-sm font-medium text-navy-800 underline underline-offset-4"
-                  >
-                    View item ↗
-                  </a>
-                )}
               </li>
             ))}
           </ul>
 
           {event.amazonListUrl && (
             <div className="mt-6">
-              <AmazonButton href={event.amazonListUrl} label="Buy from the Amazon list" />
+              <AmazonButton href={event.amazonListUrl} />
             </div>
           )}
         </section>

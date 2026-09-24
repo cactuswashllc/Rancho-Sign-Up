@@ -1,12 +1,9 @@
 "use client";
 
-import { upload } from "@vercel/blob/client";
 import Image from "next/image";
 import { useRef, useState, useTransition } from "react";
 import type { FormState } from "@/app/organizer/(app)/actions";
-
-const MAX_BYTES = 8 * 1024 * 1024;
-const TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"];
+import { IMAGE_TYPES, uploadEventImage } from "./upload";
 
 export function ImageManager({
   eventId,
@@ -33,27 +30,14 @@ export function ImageManager({
     setError(null);
     const list = Array.from(files);
     for (const [i, file] of list.entries()) {
-      if (!TYPES.includes(file.type)) {
-        setError(`${file.name}: please choose a JPG, PNG, WebP, GIF, or AVIF image.`);
-        continue;
-      }
-      if (file.size > MAX_BYTES) {
-        setError(`${file.name} is larger than 8 MB.`);
-        continue;
-      }
       try {
         setProgress(`Uploading ${i + 1} of ${list.length}…`);
-        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-80);
-        const blob = await upload(`events/${eventId}/${safeName}`, file, {
-          access: "public",
-          handleUploadUrl: "/api/blob/upload",
-          contentType: file.type,
-        });
+        const url = await uploadEventImage(eventId, file);
         const alt = file.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ");
-        const res = await addAction(blob.url, alt);
+        const res = await addAction(url, alt);
         if (res.error) setError(res.error);
-      } catch {
-        setError(`Couldn't upload ${file.name}. Please try again.`);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Upload failed.");
       }
     }
     setProgress(null);
@@ -110,7 +94,7 @@ export function ImageManager({
           <input
             ref={inputRef}
             type="file"
-            accept={TYPES.join(",")}
+            accept={IMAGE_TYPES.join(",")}
             multiple
             className="sr-only"
             id="photo-input"

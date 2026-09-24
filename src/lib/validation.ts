@@ -35,6 +35,9 @@ export const eventSchema = z.object({
   description: trimmed(4000),
   themeKey: z.string().refine(isThemeKey, "Choose a theme"),
   amazonListUrl: optionalAmazonUrl,
+  headerText: trimmed(160)
+    .optional()
+    .transform((v) => v || null),
   status: z.enum(["DRAFT", "OPEN", "CLOSED"]).optional(),
 });
 
@@ -43,7 +46,6 @@ export type EventInput = z.infer<typeof eventSchema>;
 export const itemSchema = z.object({
   name: required("Item name", 120),
   notes: trimmed(500),
-  productUrl: optionalAmazonUrl,
   quantityNeeded: z.coerce.number().int("Whole numbers only").min(1, "At least 1").max(1000, "At most 1000"),
 });
 

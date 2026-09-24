@@ -14,6 +14,7 @@ export interface EventFormValues {
   description: string;
   themeKey: string;
   amazonListUrl: string;
+  headerText: string;
   status: "DRAFT" | "OPEN" | "CLOSED";
 }
 
@@ -22,12 +23,15 @@ export function EventForm({
   initial,
   submitLabel,
   showStatus = false,
+  headerImageUrl,
 }: {
   action: (prev: FormState, fd: FormData) => Promise<FormState>;
   initial: EventFormValues;
   submitLabel: string;
   /** Status is edited here only on create; the edit page uses dedicated buttons. */
   showStatus?: boolean;
+  /** Current custom header image, shown in the live preview. */
+  headerImageUrl?: string | null;
 }) {
   const [state, formAction] = useActionState(action, {});
   const [v, setV] = useState(initial);
@@ -112,7 +116,7 @@ export function EventForm({
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="amazonListUrl" className="field-label">
-            Amazon list link <span className="font-normal text-navy-500">(optional)</span>
+            Amazon gift list link <span className="font-normal text-navy-500">(optional)</span>
           </label>
           <input
             id="amazonListUrl"
@@ -125,7 +129,27 @@ export function EventForm({
             onChange={set("amazonListUrl")}
             aria-invalid={!!fe.amazonListUrl}
           />
+          <p className="mt-1 text-xs text-navy-500">
+            Parents see one &ldquo;Buy on Amazon&rdquo; button that opens this list.
+          </p>
           {err("amazonListUrl")}
+        </div>
+        <div className="sm:col-span-2">
+          <label htmlFor="headerText" className="field-label">
+            Header text <span className="font-normal text-navy-500">(optional)</span>
+          </label>
+          <input
+            id="headerText"
+            name="headerText"
+            className="field"
+            maxLength={160}
+            placeholder={theme.tagline}
+            value={v.headerText}
+            onChange={set("headerText")}
+          />
+          <p className="mt-1 text-xs text-navy-500">
+            Shown under the event name in the header. Leave blank to use the theme&apos;s line.
+          </p>
         </div>
         {showStatus && (
           <div>
@@ -173,14 +197,14 @@ export function EventForm({
           })}
         </div>
         <div className="mt-4 overflow-hidden rounded-lg" aria-label="Theme preview">
-          <ThemeBanner theme={theme} compact>
+          <ThemeBanner theme={theme} imageUrl={headerImageUrl} compact>
             <p className="text-xs font-semibold tracking-[0.2em] uppercase" style={{ color: theme.accent }}>
               {theme.name}
             </p>
             <p className="mt-2 font-serif text-2xl font-semibold sm:text-3xl">
               {v.title || "Your event name"}
             </p>
-            <p className="mt-1 font-serif italic text-navy-300">{theme.tagline}</p>
+            <p className="mt-1 font-serif italic text-navy-100">{v.headerText || theme.tagline}</p>
           </ThemeBanner>
         </div>
       </fieldset>

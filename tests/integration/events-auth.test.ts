@@ -16,7 +16,7 @@ describe("organizer item management", () => {
     const id = items[0]!.id;
     await createSignup(event.id, parent(), { [id]: 4 });
 
-    const base = { name: "Cookies", notes: "", productUrl: null };
+    const base = { name: "Cookies", notes: "" };
     expect((await updateItem(event.id, id, { ...base, quantityNeeded: 3 })).ok).toBe(false);
     expect((await updateItem(event.id, id, { ...base, quantityNeeded: 4 })).ok).toBe(true);
   });
@@ -37,7 +37,6 @@ describe("organizer item management", () => {
     const r = await updateItem(a.event.id, b.items[0]!.id, {
       name: "x",
       notes: "",
-      productUrl: null,
       quantityNeeded: 1,
     });
     expect(r.ok).toBe(false);
