@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 const schema = z.object({
-  DATABASE_URL: z.string().min(1),
   /** Public base URL used in emailed links, e.g. https://signups.example.org */
   APP_URL: z.string().url().optional(),
   /** Comma-separated emails that are always admins (bootstrap). */

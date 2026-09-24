@@ -18,7 +18,7 @@ of each item they'll bring.
 | Piece    | Service                                       | Free tier                   |
 | -------- | --------------------------------------------- | --------------------------- |
 | Hosting  | Vercel (Hobby)                                | Plenty for a school site    |
-| Database | Neon Postgres (Vercel Marketplace)            | 0.5 GB, no auto-delete      |
+| Database | Supabase Postgres (Vercel integration)        | 500 MB                      |
 | Photos   | Vercel Blob                                   | 1 GB storage                |
 | Email    | Resend                                        | 3,000 emails/month, 100/day |
 | App      | Next.js 16 · React 19 · Tailwind 4 · Prisma 7 |                             |
@@ -27,10 +27,11 @@ of each item they'll bring.
 
 1. **Import the repo** in Vercel (Framework: Next.js). The `vercel-build` script runs
    `prisma migrate deploy && next build`, so the database schema is applied on every deploy.
-2. **Storage → Create → Neon (Postgres)** and connect it to the project. This sets `DATABASE_URL` and
-   `DATABASE_URL_UNPOOLED`.
-   _Tip:_ enable Neon's "create a branch for each preview deployment" option so preview deploys never
-   migrate the production database.
+2. **Supabase:** connect a **dedicated** Supabase project through the Vercel integration. It sets
+   `POSTGRES_PRISMA_URL` (pooled, used by the app) and `POSTGRES_URL_NON_POOLING` (used for migrations).
+   Before migrating, the build runs `scripts/assert-own-database.ts`, which aborts if the database has
+   tables from another app. Every table has Row Level Security enabled, so Supabase's public API can't
+   read it; the app connects as the table owner.
 3. **Storage → Create → Blob** and connect it. This sets `BLOB_READ_WRITE_TOKEN`.
 4. **Resend:** the sending domain is `ranchosignup.com` (DKIM TXT `resend._domainkey`, SPF CNAMEs `send` and
    `rsend`, plus a `_dmarc` TXT, all in Cloudflare as DNS only). Create an API key once it shows "Verified".
