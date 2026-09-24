@@ -50,10 +50,7 @@ test.describe("signed in", () => {
     await page.goto(link);
     await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible();
     await expect(page.getByText("Bring a card for every classmate!")).toBeVisible();
-    await expect(page.getByRole("link", { name: /Buy on Amazon/ })).toHaveAttribute(
-      "href",
-      "https://www.amazon.com/hz/wishlist/ls/E2E",
-    );
+    await expect(page.getByRole("link", { name: /Buy on Amazon/ })).toHaveCount(0);
     await expect(page.getByText("3 of 3 still needed")).toBeVisible();
   });
 

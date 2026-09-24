@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { AmazonButton } from "@/components/AmazonButton";
 import { MotifIcon } from "@/components/Motif";
+import { ProgressBar } from "@/components/ProgressBar";
 import { PhotoGallery } from "@/components/PhotoGallery";
 import { ThemeBanner } from "@/components/ThemeBanner";
 import { getCurrentOrganizer } from "@/lib/auth";
@@ -84,14 +84,15 @@ export default async function EventPage({ params }: Props) {
             <p className="mt-1 font-serif text-3xl font-semibold">
               {totalClaimed} <span className="text-lg text-navy-500">of {totalNeeded} covered</span>
             </p>
+            <div className="mt-3">
+              <ProgressBar value={totalClaimed} max={totalNeeded} label="Items covered" />
+            </div>
             {event.amazonListUrl && (
-              <div className="mt-4">
-                <AmazonButton href={event.amazonListUrl} />
-                <p className="mt-2 text-xs text-navy-700">
-                  Sign up below first so we know who&apos;s bringing what, then buy your items from our Amazon
-                  gift list.
-                </p>
-              </div>
+              // The Amazon button appears only after signing up (confirmation page + email),
+              // so parents claim items here before buying.
+              <p className="mt-3 text-xs text-navy-700">
+                Sign up below and you&apos;ll get a link to buy your items from our Amazon gift list.
+              </p>
             )}
           </aside>
         </div>
