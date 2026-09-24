@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy-950: #061528;
+  --color-navy-900: #0b2545;
+  --color-navy-800: #13315c;
+  --color-navy-700: #1d4273;
+  --color-navy-500: #4a6a92;
+  --color-navy-300: #8da9c4;
+  --color-navy-100: #dbe5f0;
+  --color-navy-50: #eef3f8;
+  --color-ivory: #fbfaf7;
+  --color-gold: #b8962e;
+
+  --font-serif: var(--font-cormorant), "Georgia", "Times New Roman", serif;
+  --font-sans: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+:root {
+  /* Overridden per event by its theme. */
+  --accent: #8da9c4;
+  --accent-soft: #eef3f8;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-variant-numeric: lining-nums;
+  background: var(--color-ivory);
+  color: var(--color-navy-900);
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold tracking-wide transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-700 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply bg-navy-900 text-white hover:bg-navy-800;
+  }
+  .btn-secondary {
+    @apply border border-navy-900 bg-white text-navy-900 hover:bg-navy-50;
+  }
+  .btn-ghost {
+    @apply text-navy-800 hover:bg-navy-50;
+  }
+  .btn-danger {
+    @apply border border-red-700 bg-white text-red-800 hover:bg-red-50;
+  }
+  .field-label {
+    @apply mb-1.5 block text-sm font-semibold text-navy-900;
+  }
+  .field {
+    @apply block min-h-11 w-full rounded-md border border-navy-300 bg-white px-3 py-2 text-base text-navy-900 placeholder:text-navy-500/70 focus:border-navy-700 focus:outline-2 focus:outline-offset-0 focus:outline-navy-700/30;
+  }
+  .field-error {
+    @apply mt-1 text-sm text-red-800;
+  }
+  .card {
+    @apply rounded-lg border border-navy-100 bg-white shadow-[0_1px_2px_rgba(11,37,69,0.06)];
+  }
+  .eyebrow {
+    @apply text-xs font-semibold tracking-[0.2em] text-navy-500 uppercase;
+  }
+  .heading {
+    @apply font-serif font-semibold text-navy-900 lining-nums;
+  }
+}

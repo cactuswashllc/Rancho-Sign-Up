@@ -1,0 +1,155 @@
+// Rancho Solano PTO sign-ups — database schema.
+//
+// Prisma 7: the connection URL lives in prisma.config.ts.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum OrganizerRole {
+  ADMIN
+  ORGANIZER
+}
+
+enum EventStatus {
+  DRAFT
+  OPEN
+  CLOSED
+}
+
+/// A PTO member allowed to sign in and manage events. Admins can also
+/// add and remove other organizers.
+model Organizer {
+  id        String        @id @default(cuid())
+  email     String        @unique
+  name      String?
+  role      OrganizerRole @default(ORGANIZER)
+  active    Boolean       @default(true)
+  createdAt DateTime      @default(now())
+
+  sessions Session[]
+  events   Event[]
+}
+
+/// One-time sign-in link. Only the SHA-256 hash of the token is stored.
+model MagicLinkToken {
+  id        String    @id @default(cuid())
+  email     String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([email])
+}
+
+/// Organizer browser session. Only the SHA-256 hash of the cookie is stored.
+model Session {
+  id          String    @id @default(cuid())
+  tokenHash   String    @unique
+  organizerId String
+  organizer   Organizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+
+  @@index([organizerId])
+}
+
+model Event {
+  id            String      @id @default(cuid())
+  slug          String      @unique
+  title         String
+  /// Calendar date of the event (stored at midnight UTC; displayed as a date only).
+  eventDate     DateTime    @db.Date
+  location      String?
+  description   String      @default("")
+  themeKey      String      @default("classic")
+  amazonListUrl String?
+  status        EventStatus @default(DRAFT)
+  createdById   String?
+  createdBy     Organizer?  @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  images  EventImage[]
+  items   Item[]
+  signups Signup[]
+
+  @@index([status, eventDate])
+}
+
+model EventImage {
+  id        String   @id @default(cuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String   @default("")
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([eventId, sortOrder])
+}
+
+model Item {
+  id             String   @id @default(cuid())
+  eventId        String
+  event          Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name           String
+  notes          String   @default("")
+  /// Optional direct product link (must be an Amazon URL).
+  productUrl     String?
+  quantityNeeded Int
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+
+  lines SignupItem[]
+
+  @@index([eventId, sortOrder])
+}
+
+/// One parent submission for an event. It can cover several items.
+model Signup {
+  id            String   @id @default(cuid())
+  eventId       String
+  event         Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  parentName    String
+  parentEmail   String
+  studentName   String
+  grade         String
+  /// SHA-256 of the private manage-link token emailed to the parent.
+  editTokenHash String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  items SignupItem[]
+
+  @@index([eventId])
+}
+
+model SignupItem {
+  id       String @id @default(cuid())
+  signupId String
+  signup   Signup @relation(fields: [signupId], references: [id], onDelete: Cascade)
+  itemId   String
+  /// NoAction: a claimed item can never be deleted out from under parents.
+  /// (deleteEvent removes sign-ups before the event for this reason.)
+  item     Item   @relation(fields: [itemId], references: [id], onDelete: NoAction)
+  quantity Int
+
+  @@unique([signupId, itemId])
+  @@index([itemId])
+}
+
+/// Sliding-window rate limiting for public forms (keys hold hashed IPs).
+model RateLimitHit {
+  id        String   @id @default(cuid())
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+}
