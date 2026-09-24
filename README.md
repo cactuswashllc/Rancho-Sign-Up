@@ -32,15 +32,18 @@ of each item they'll bring.
    _Tip:_ enable Neon's "create a branch for each preview deployment" option so preview deploys never
    migrate the production database.
 3. **Storage → Create → Blob** and connect it. This sets `BLOB_READ_WRITE_TOKEN`.
-4. **Resend:** create a free account, add and verify a sending domain (for example
-   `signups.ranchosolano.org` or a PTO domain; DNS records required), and create an API key.
+4. **Resend:** create a free account, add the domain `ranchosignup.com`, add the DNS records Resend shows
+   (DKIM, SPF and MX, in Cloudflare), wait for "Verified", then create an API key.
 5. **Environment variables** (Project → Settings → Environment Variables):
    - `RESEND_API_KEY`: from Resend
-   - `EMAIL_FROM`, for example `Rancho Solano PTO <signups@your-verified-domain>`
+   - `EMAIL_FROM`: `Rancho Solano PTO <signups@ranchosignup.com>`
    - `ADMIN_EMAILS`: your email (comma-separate several)
-   - `APP_URL`: the production URL, for example `https://rancho-solano-signups.vercel.app`
+   - `APP_URL`: `https://ranchosignup.com`
    - `RATE_LIMIT_SALT`: any long random string
-6. Deploy, go to `/organizer`, enter an `ADMIN_EMAILS` address, and click the emailed link. Add other PTO
+6. **Domain:** in Vercel, Project → Settings → Domains → add `ranchosignup.com` (and `www.ranchosignup.com`
+   redirecting to it). In Cloudflare DNS, add the records Vercel shows (normally `A @ 76.76.21.21` and
+   `CNAME www cname.vercel-dns.com`) with the proxy **off** (grey cloud), so Vercel can issue the certificate.
+7. Deploy, go to `/organizer`, enter an `ADMIN_EMAILS` address, and click the emailed link. Add other PTO
    members under **Organizers**.
 
 > Without a verified domain, Resend only delivers to your own account's email address, so parents
